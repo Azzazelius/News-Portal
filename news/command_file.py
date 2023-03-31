@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db.models import Max
-from django.db import models
 from news.models import Author
 from news.models import Category
 from news.models import Post
@@ -79,7 +78,6 @@ Post.objects.get(id="3").like()
 Post.objects.get(id="3").like()
 Post.objects.get(id="3").like()
 Post.objects.get(id="3").like()
-Post.objects.get(id="3").dislike()
 
 
 Comment.objects.get(id="1").dislike()
@@ -91,14 +89,21 @@ Comment.objects.get(id="2").like()
 
 Comment.objects.get(id="3").like()
 Comment.objects.get(id="3").dislike()
+Comment.objects.get(id="3").dislike()
 
 Comment.objects.get(id="4").like()
-Comment.objects.get(id="4").like()
-Comment.objects.get(id="4").like()
-Comment.objects.get(id="4").like()
-Comment.objects.get(id="4").like()
+
+Comment.objects.get(id="5").like()
+Comment.objects.get(id="5").like()
+Comment.objects.get(id="5").like()
+Comment.objects.get(id="5").like()
+Comment.objects.get(id="5").like()
 
 # ====================== обновление рейтинга авторов
+# суммарный рейтинг каждой статьи автора умножается на 3;
+# суммарный рейтинг всех комментариев автора;
+# суммарный рейтинг всех комментариев к статьям автора.
+
 Author.objects.get(id=1).update_rating()
 Author.objects.get(id=2).update_rating()
 
@@ -106,16 +111,20 @@ Author.objects.get(id=2).update_rating()
 
 a_max_rating = Author.objects.aggregate(rating__max=Max('rating'))['rating__max']
 best_a_id = Author.objects.get(rating=a_max_rating).id
+
 best_a_info = Author.objects.filter(id=best_a_id).values_list('user_id__username', 'rating').first()
 
 # ========================== Вывод данных о лучшем посте. дата, юзернейм, рейтинг, заголовок, превью
 ar_max_rating = Post.objects.filter(post_type='ar').aggregate(rating__max=Max('rating'))['rating__max']
 best_ar_id = Post.objects.get(rating=ar_max_rating).id
 prev = Post.objects.get(id=best_ar_id).preview()
+
 best_ar_info = Post.objects.filter(id=best_ar_id).values_list('t_creation', 'author_id__user__username', 'rating', 'title').first(), prev
 
 # ========================== Вывод комментариев к статье
 
 r = Comment.objects.filter(post_id=best_ar_id).values_list('t_creation', 'user_id__username', 'rating', 'comment')
+
+
 
 

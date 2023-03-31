@@ -7,16 +7,31 @@ class Author(models.Model):
     rating = models.IntegerField(default=0) # значение вычисляется в update_rating
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE) # связь с методом User один к одному
 
+    # def update_rating(self):
+    #     post_ids = self.post.filter(author=self).values_list('id', flat=True) #(flat=True) чтобы получить одним списком id всех постов этого автора
+    #     r_posts = Post.objects.filter(author=self).aggregate(models.Sum('rating')) #суммарный рейтинг за посты
+    #     r_posts_sum = r_posts['rating__sum'] if r_posts and len(r_posts) == 1 else 0
+    #     r_author_comments = Comment.objects.filter(post__author=self).aggregate(models.Sum('rating'))['rating__sum'] # Аналогично строке выше. Но, двойным "_" (post__author=self) указываем, что интересующий нас параметр author находится не в таблице comments, а в связаной с ней таблицей post
+    #     r_posts_comments = Comment.objects.filter(post__id__in=post_ids).aggregate(models.Sum('rating'))['rating__sum']
+    #     print(r_posts, r_posts_sum, r_author_comments, r_posts_comments)
+    #     self.rating = (int(r_posts_sum) * 3) + int(r_author_comments) + int(r_posts_comments)
+    #     print(self.rating)
+    #     self.save()
+
     def update_rating(self):
-        post_ids = self.post.filter(author=self).values_list('id', flat=True) #(flat=True) чтобы получить одним списком id всех постов этого автора
-        r_posts = Post.objects.filter(author=self).aggregate(models.Sum('rating')) #суммарный рейтинг за посты
-        r_posts_sum = r_posts['rating__sum'] if r_posts and len(r_posts) == 1 else 0
-        r_author_comments = Comment.objects.filter(post__author=self).aggregate(models.Sum('rating'))['rating__sum'] # Аналогично строке выше. Но, двойным "_" (post__author=self) указываем, что интересующий нас параметр author находится не в таблице comments, а в связаной с ней таблицей post
-        r_posts_comments = Comment.objects.filter(post__id__in=post_ids).aggregate(models.Sum('rating'))['rating__sum']
-        print(r_posts, r_posts_sum, r_author_comments, r_posts_comments)
-        self.rating = int(r_posts_sum) * 3 + int(r_author_comments) + int(r_posts_comments)
+        r_comments_by_author = Comment.objects.filter(post_id__author_id=self).aggregate(models.Sum('rating'))['rating__sum'] # тут что-то не так
+        # r_comments_by_author = Comment.objects.filter(user_id=self).aggregate(models.Sum('rating'))['rating_sum'] # по задумке должен был работать этот вариант, но есть ошибка, которую я не понял
+
+
+        r_posts = Post.objects.filter(author_id=self).aggregate(models.Sum('rating')) #суммарный рейтинг за посты
+        post_ids = Post.objects.filter(author_id=self).values_list('id', flat=True) #(flat=True) чтобы получить одним списком id всех постов этого автора
+        r_comments_to_author_posts = Comment.objects.filter(post_id__in=post_ids).aggregate(models.Sum('rating'))['rating__sum']
+
+        print(r_posts, r_posts['rating__sum'], r_comments_by_author, r_comments_to_author_posts)
+        self.rating = (int(r_posts['rating__sum']) * 3) + int(r_comments_by_author) + int(r_comments_to_author_posts)
         print(self.rating)
         self.save()
+
 
 
 class Category(models.Model):
