@@ -7,7 +7,8 @@ from pprint import pprint
 
 class PostsList(ListView):
     model = Post # Указываем модель, объекты которой мы будем выводить
-    ''' ordering = '' Заметка. Тут надо добавить сортировку по времени'''
+    # ordering = 't_creation' # Заметка. Тут надо добавить сортировку по времени
+    ordering = '-t_creation' # Заметка. Тут надо добавить сортировку по времени
     # queryset = .objects.filter # опциональный фильтр, на случай если ещё пригодится
     template_name = 'posts.html'  # Указываем имя шаблона, с инструкциями по отображению объектов модели
     context_object_name = 'posts'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
@@ -15,7 +16,15 @@ class PostsList(ListView):
 class PostFull(DetailView):
     model = Post
     template_name = 'post_full.html'
-    context_object_name = 'post'
+    # context_object_name = 'post'
+
+class CommentsList(ListView):
+    model = Comment
+    # ordering = '-t_creation'
+    template_name = 'com.html'
+    context_object_name = 'comments'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
+
+
 
 
     # def get_context_data(self, **kwargs): # Метод get_context_data позволяет нам изменить набор данных,который будет передан в шаблон.

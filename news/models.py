@@ -62,8 +62,8 @@ class Post(models.Model):
             content += '...'
         return content
 
-    def __str__(self):
-        return self.title
+    # def __str__(self):
+    #     return self.title
 
 '''
 С геттерами не срослось, оставил работу напрямую с переменными

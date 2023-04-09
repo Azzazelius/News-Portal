@@ -1,0 +1,16 @@
+<!--{% extends 'flatpages/default.html' %}-->
+{% extends 'posts.html' %}
+
+{% block title %}
+Comment
+{% endblock title %}
+
+
+
+{% block content %}
+
+       {% for c in comments %}
+               <h3>{{Comment.comment}}</h3>
+       {% endfor %}
+
+{% endblock content %}

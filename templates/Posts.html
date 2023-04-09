@@ -7,30 +7,21 @@ Post
 
 
 {% block content %}
-   <h1>Все новости</h1>
-   <!-- Выводим новости, только если они есть с помощью тега if -->
+   <h1>Всего новостей: {{ posts|length }}</h1>
+    <!--Выводим новости, только если они есть с помощью тега if -->
+  <hr>
   <hr>
 
    {% if posts %}
-        <table>
-            <tr>
-                <td><b>Заголовок</b></td>
-                <td><b>Превью</b></td>
-                <td><b>Рейтинг</b></td>
-                <td><b>Категории</b></td>
-            </tr>
-
-            {% for post in posts %}
-                <tr>
-                    <td style="text-align: left;">{{post}}</td>
-                    <td style="text-align: left;">{{post.content|truncatewords:20}}</td>
-                    <td>{{post.rating}}</td>
-
-                    <td style="text-align: left;">Категории</td>
-
-                </tr>
-            {% endfor %}
-        </table>
+       {% for post in posts %}
+           <h3 style="text-align: center">{{post.title}}</h3>
+           <h6 style="text-align: left;">{{post.content|truncatewords:20}}</h6>
+           <div style="display: flex; justify-content: space-between; align-items: center;">
+               <h6>{{post.author}} {{post.t_creation|date:"j.F.Y" }}</h6>
+               <h6>Рейтинг: {{post.rating}}</h6>
+           </div>
+           <hr>
+       {% endfor %}
    {% else %}
        <h2>Конец истории</h2>
    {% endif %}
