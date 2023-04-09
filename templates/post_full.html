@@ -1,0 +1,21 @@
+
+post.author
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+PostFull
+{% endblock title %}
+
+
+
+<!-- В контенте на странице мы выводим новость, идентификатор которого был передан в url -->
+{% block content %}
+
+<h1 style="text-align: center; font-size: 2em;">{{ post }}</h1>
+<hr>
+
+<p style="font-family: monospace; text-align: left;">{{ post.content }}</p>
+<p style="text-align: right;">{{ post.author }}</p>
+
+{% endblock content %}

@@ -1,27 +1,14 @@
 from django.db import models
-from django.contrib.auth.models import User
-from datetime import datetime
+from django.core.validators import MinValueValidator
 
 class Author(models.Model):
     full_name = models.CharField(max_length=100)
     rating = models.IntegerField(default=0) # значение вычисляется в update_rating
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE) # связь с методом User один к одному
 
-    # def update_rating(self):
-    #     post_ids = self.post.filter(author=self).values_list('id', flat=True) #(flat=True) чтобы получить одним списком id всех постов этого автора
-    #     r_posts = Post.objects.filter(author=self).aggregate(models.Sum('rating')) #суммарный рейтинг за посты
-    #     r_posts_sum = r_posts['rating__sum'] if r_posts and len(r_posts) == 1 else 0
-    #     r_author_comments = Comment.objects.filter(post__author=self).aggregate(models.Sum('rating'))['rating__sum'] # Аналогично строке выше. Но, двойным "_" (post__author=self) указываем, что интересующий нас параметр author находится не в таблице comments, а в связаной с ней таблицей post
-    #     r_posts_comments = Comment.objects.filter(post__id__in=post_ids).aggregate(models.Sum('rating'))['rating__sum']
-    #     print(r_posts, r_posts_sum, r_author_comments, r_posts_comments)
-    #     self.rating = (int(r_posts_sum) * 3) + int(r_author_comments) + int(r_posts_comments)
-    #     print(self.rating)
-    #     self.save()
-
     def update_rating(self):
-        r_comments_by_author = Comment.objects.filter(post_id__author_id=self).aggregate(models.Sum('rating'))['rating__sum'] # тут что-то не так
-        # r_comments_by_author = Comment.objects.filter(user_id=self).aggregate(models.Sum('rating'))['rating_sum'] # по задумке должен был работать этот вариант, но есть ошибка, которую я не понял
-
+        r_comments_by_author = Comment.objects.filter(user_id=self.user.id).aggregate(models.Sum('rating'))['rating__sum'] # new variant
+        # r_comments_by_author = Comment.objects.filter(post_id__author_id=self).aggregate(models.Sum('rating'))['rating__sum'] # прошлый вариант
 
         r_posts = Post.objects.filter(author_id=self).aggregate(models.Sum('rating')) #суммарный рейтинг за посты
         post_ids = Post.objects.filter(author_id=self).values_list('id', flat=True) #(flat=True) чтобы получить одним списком id всех постов этого автора
@@ -32,10 +19,15 @@ class Author(models.Model):
         print(self.rating)
         self.save()
 
+    def __str__(self):
+        return self.full_name
 
 
 class Category(models.Model):
     category_name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.category_name
 
 
 class Post(models.Model):
@@ -64,34 +56,39 @@ class Post(models.Model):
         self.rating -= 1
         self.save()
 
-
-    # @property # геттер рейтинга поста
-    # def rating(self):
-    #     return self._rating
-    # #
-    # # @rating.setter
-    # # def like(self,value):
-    # #     self._rating = value
-    # #     self.save(update_fields=['_rating'])
-
-    # @rating.setter
-    # def dislike(self,value):
-    #     self._rating = int(value) - 1
-    #     self.save(update_fields=['_rating'])
-    #
-    #     # self._rating -= 1 # рейтинг может быть отрицательным
-
-
     def preview(self):
         content = self.content[:124]
         if len(self.content) > 124:
             content += '...'
         return content
 
+    def __str__(self):
+        return self.title
+
+'''
+С геттерами не срослось, оставил работу напрямую с переменными
+    @property # геттер рейтинга поста
+    def rating(self):
+        return self._rating
+    #
+    # @rating.setter
+    # def like(self,value):
+    #     self._rating = value
+    #     self.save(update_fields=['_rating'])
+
+    @rating.setter
+    def dislike(self,value):
+        self._rating = int(value) - 1
+        self.save(update_fields=['_rating'])
+
+    #     # self._rating -= 1 # рейтинг может быть отрицательным
+'''
+
+
+
 class PostCategory(models.Model): # Промежуточная модель для связи «многие ко многим»:
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
-
 
 
 class Comment(models.Model):
@@ -110,4 +107,6 @@ class Comment(models.Model):
         self.rating -= 1
         self.save()
 
-# ===========================
+    def __str__(self):
+        return self.comment
+
