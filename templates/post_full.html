@@ -1,6 +1,8 @@
 <!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
 {% extends 'flatpages/default.html' %}
 
+{% load custom_filters %}
+
 {% block title %}
 PostFull
 {% endblock title %}
@@ -10,14 +12,14 @@ PostFull
 <!-- В контенте на странице мы выводим новость, идентификатор которого был передан в url -->
 {% block content %}
 
-<h1 style="text-align: center; font-size: 2em;">{{ post.title }}</h1>
+<h1 style="text-align: center; font-size: 2em;">{{ post.title|censor }}</h1>
 <hr>
 
-<p style="font-family: monospace; text-align: left;">{{ post.content }}</p>
+<p style="font-family: monospace; text-align: left;">{{ post.content|censor }}</p>
 <p style="text-align: right;">{{ post.author }}</p>
 <p style="text-align: right;">{{post.t_creation|date:"j.m.Y" }}</p>
 
 <hr>
-               <h3>asda {{Comment.comment}}</h3>
+<h3>{{Comment.comment}}</h3>
 
 {% endblock content %}

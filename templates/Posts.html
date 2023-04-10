@@ -1,5 +1,7 @@
 {% extends 'flatpages/default.html' %}
 
+{% load custom_filters %}
+
 {% block title %}
 Post
 {% endblock title %}
@@ -14,8 +16,8 @@ Post
 
    {% if posts %}
        {% for post in posts %}
-           <h3 style="text-align: center">{{post.title}}</h3>
-           <h6 style="text-align: left;">{{post.content|truncatewords:20}}</h6>
+           <h3 style="text-align: center">{{post.title|censor}}</h3>
+           <h6 style="text-align: left;">{{post.content|truncatewords:20|censor}}</h6>
            <div style="display: flex; justify-content: space-between; align-items: center;">
                <h6>{{post.author}} {{post.t_creation|date:"j.F.Y" }}</h6>
                <h6>Рейтинг: {{post.rating}}</h6>
