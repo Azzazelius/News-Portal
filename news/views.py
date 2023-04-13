@@ -1,17 +1,16 @@
 # Импортируем класс, который говорит нам о том,что в этом представлении мы будем выводить список объектов из БД
 from django.urls import reverse_lazy
-from django.shortcuts import render
 from django.views.generic import (
-    ListView,
-    DetailView,
-    CreateView,
-    UpdateView,
-    DeleteView
-)
+                                    ListView,
+                                    DetailView,
+                                    CreateView,
+                                    UpdateView,
+                                    DeleteView
+                                )
 from .models import (Author, Category, Post, Comment)
 from .forms import NewsForm
 from .filters import PostFilter
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class PostsList(ListView):
@@ -50,14 +49,14 @@ class ArticlesList(ListView):
     context_object_name = 'articles'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
 
 
-class NewsCreate(CreateView):
+class NewsCreate(CreateView, LoginRequiredMixin):
     form_class = NewsForm
     model = Post
     template_name = 'create.html'
     success_url = reverse_lazy('posts_list')
 
 
-class NewsEdit(UpdateView):
+class NewsEdit(UpdateView, LoginRequiredMixin):
     form_class = NewsForm
     model = Post
     template_name = 'create.html'
@@ -65,7 +64,6 @@ class NewsEdit(UpdateView):
 
 
 class NewsDelete(DeleteView):
-    # form_class = NewsForm
     model = Post
     template_name = 'delete.html'
     success_url = reverse_lazy('posts_list')

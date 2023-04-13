@@ -3,16 +3,25 @@
 
 
 {% block content %}
-<h1>Редактировать новость</h1>
 
-<a href="../#" style="position: fixed; left: 0; top: 100px;">Posts</a>
-<a href="../search/" style="position: fixed; left: 0; top: 150px;">Search</a>
+{% if user.is_authenticated %}
+
+<h1>Редактировать новость</h1>
+<a href="../#" style="position: fixed; left: 0; top: 100px;">Back</a>
 
 
 <hr>
+Hi {{ user.username }}!
 <form action="" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Save" />
 </form>
+{% else %}
+  <h1 style="font-weight: bold">Access denied!</h1>
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+
+
 {% endblock content %}
