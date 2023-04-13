@@ -11,6 +11,10 @@ PostFull
 
 <!-- В контенте на странице мы выводим новость, идентификатор которого был передан в url -->
 {% block content %}
+<a href="../#" style="position: fixed; left: 0; top: 100px;">Back</a>
+<a href="edit" style="position: fixed; left: 0; top: 140px;">Edit</a>
+<a href="delete" style="position: fixed; left: 0; top: 180px;">Delete</a>
+
 
 <h1 style="text-align: center; font-size: 2em;">{{ post.title|censor }}</h1>
 <hr>

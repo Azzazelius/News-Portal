@@ -1,6 +1,7 @@
 from django import template
 
 
+
 register = template.Library()
 
 # Регистрируем наш фильтр под именем currency, чтоб Django понимал,

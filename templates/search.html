@@ -1,0 +1,40 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block title %}
+Post
+{% endblock title %}
+
+{% block content %}
+   <h1>Поиск постов</h1>
+<!--<a href="../#">Posts</a>-->
+<a href="../#" style="position: fixed; left: 0; top: 100px;">Posts</a>
+
+  <hr>
+
+   <form action="" method="get"> <!--       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}-->
+       {{ filterset.form.as_p }} <!--       {# Добавим кнопку отправки данных формы #}-->
+       <input type="submit" value="Найти" />
+   </form>
+
+
+
+  <hr>
+
+   {% if posts %}
+       {% for post in posts %}
+           <a href="{% url 'post_full' pk=post.pk %}" style="display: block; text-align: center; font-size:24px; font-weight: bold">{{post.title|censor}}</a>
+            <p></p>
+           <h6 style="text-align: left; font-style: italic;">{{post.content|truncatewords:20|censor}}</h6>
+            <p></p>
+           <div style="display: flex; justify-content: space-between; align-items: center;">
+               <h6>{{post.author}} {{post.t_creation|date:"j.F.Y" }}</h6>
+               <h6>Рейтинг: {{post.rating}}</h6>
+           </div>
+           <hr>
+       {% endfor %}
+   {% else %}
+       <h2>Конец истории</h2>
+   {% endif %}
+
+{% endblock content %}

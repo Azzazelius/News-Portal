@@ -1,0 +1,30 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+Articles
+{% endblock title %}
+
+
+
+{% block content %}
+   <h1>!!!!Всего статей: {{ articles|length }}</h1>
+  <hr>
+  <hr>
+
+   {% if posts %}
+       {% for post in articles %}
+           <h3 style="text-align: center">{{post.title|censor}}</h3>
+           <h6 style="text-align: left;">{{post.content|truncatewords:20|censor}}</h6>
+           <div style="display: flex; justify-content: space-between; align-items: center;">
+               <h6>{{post.author}} {{post.t_creation|date:"j.F.Y" }}</h6>
+               <h6>Рейтинг: {{post.rating}}</h6>
+           </div>
+           <hr>
+       {% endfor %}
+   {% else %}
+       <h2>Конец истории</h2>
+   {% endif %}
+
+{% endblock content %}
