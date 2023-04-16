@@ -32,7 +32,9 @@ class PostsList(ListView):
     def get_context_data(self, **kwargs):  # Метод get_context_data позволяет нам изменить набор данных, который будет передан в шаблон.
         context = super().get_context_data(**kwargs)
         context['filterset'] = self.filterset  # Добавляем в контекст объект фильтрации.
+        context['post_count'] = Post.objects.count()
         return context
+
 
 
 class PostFull(DetailView):
@@ -70,9 +72,9 @@ class NewsDelete(DeleteView):
 
 
 class PostSearch(ListView):
-    model = Post # Указываем модель, объекты которой мы будем выводить
-    template_name = 'search.html'  # Указываем имя шаблона, с инструкциями по отображению объектов модели
-    context_object_name = 'posts'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
+    model = Post
+    template_name = 'search.html'
+    context_object_name = 'posts'
 
     def get_queryset(self):
         # Получаем обычный запрос
@@ -83,9 +85,7 @@ class PostSearch(ListView):
         # Возвращаем из функции отфильтрованный список товаров
         return self.filterset.qs
 
-   # Метод get_context_data позволяет нам изменить набор данных, который будет передан в шаблон.
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Добавляем в контекст объект фильтрации.
         context['filterset'] = self.filterset
         return context

@@ -18,20 +18,12 @@ Post
       <p style="text-align: right; font-weight: bold">You are not logged in &nbsp&nbsp</p>
       <a style="display: block; text-align: right" href="{% url 'login' %}">Log In</a>
     {% endif %}
-
-      <hr>
 </div>
-      <h1>Всего новостей: {{ posts|length }}</h1>
-        <!--<h1>Всего новостей: {{ posts.paginator.count }}</h1>-->
-<ul>
-    {%  for post in post_count %}
-        <li>{{ post.title }}</li>
-        <li>{{ post.name }}</li>
-        <li>{{ post.name }}</li>
-    {% endfor %}
-</ul>
 
-  <hr>
+<hr>
+<h1>Всего новостей: {{ post_count }}</h1>
+<hr>
+
 <a href="search" style="position: fixed; left: 0; top: 100px;">Search</a>
 <a href="create" style="position: fixed; left: 0; top: 140px;">Create</a>
 
