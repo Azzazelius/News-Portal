@@ -21,9 +21,9 @@ Post
 </div>
 
 {% if user.is_authenticated %}
-    <!-- User is a member of the "authors" group -->
-    <button> <a href="upgrade/"> Стать автором</a> </button>
-    <!-- User is not a member of the "authors" group -->
+    {% if not request.user|has_group:"authors" %}
+        <button> <a href="upgrade/"> Стать автором</a> </button>
+    {% endif %}
 {% endif %}
 
 

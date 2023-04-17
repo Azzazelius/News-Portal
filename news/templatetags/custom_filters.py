@@ -16,3 +16,7 @@ def censor(value):
          value = value.replace(word[1:-2], '*' * (len(word)-1))
    return value
 
+
+@register.filter(name='has_group')
+def has_group(user, group_name):
+    return user.groups.filter(name=group_name).exists()

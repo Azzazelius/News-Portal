@@ -120,6 +120,5 @@ def upgrade_me(request):
 
 from django.shortcuts import render
 
-def my_view(request):
-    is_author = request.user.groups.filter(name='authors').exists()
-    return render(request, 'my_template.html', {'is_author': is_author})
+
+
