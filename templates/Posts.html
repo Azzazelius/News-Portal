@@ -20,6 +20,13 @@ Post
     {% endif %}
 </div>
 
+{% if user.is_authenticated %}
+    <!-- User is a member of the "authors" group -->
+    <button> <a href="upgrade/"> Стать автором</a> </button>
+    <!-- User is not a member of the "authors" group -->
+{% endif %}
+
+
 <hr>
 <h1>Всего новостей: {{ post_count }}</h1>
 <hr>
