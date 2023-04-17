@@ -21,6 +21,8 @@ Hi {{ user.username }}!
   <h1 style="font-weight: bold">Access denied!</h1>
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log In</a>
+  <a href="{% url 'socialaccount_signup' %}" class="btn btn-primary">Sign Up</a>
+
 {% endif %}
 
 

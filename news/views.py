@@ -5,12 +5,19 @@ from django.views.generic import (
                                     DetailView,
                                     CreateView,
                                     UpdateView,
-                                    DeleteView
+                                    DeleteView,
+                                    RedirectView
                                 )
 from .models import (Author, Category, Post, Comment)
 from .forms import NewsForm
 from .filters import PostFilter
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+
+
+class HomePageView(RedirectView):
+    url = 'posts/'
+    permanent = True
 
 
 class PostsList(ListView):
@@ -89,3 +96,4 @@ class PostSearch(ListView):
         context = super().get_context_data(**kwargs)
         context['filterset'] = self.filterset
         return context
+
