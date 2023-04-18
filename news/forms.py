@@ -10,19 +10,15 @@ class NewsForm(forms.ModelForm):
         fields = [
             'title',
             'content',
-            'author',
             'category',
+            'author',
         ]
+    #
+    # widgets = {
+    #     'category': forms.SelectMultiple(attrs={'class': 'selectpicker', 'data-live-search': 'true'}),
+    #
+    # }
 
-    widgets = {
-        'category': forms.SelectMultiple(attrs={
-            'class': 'selectpicker',
-            'data-live-search': 'true',
-            'multiple': True,
-            'style': 'display: flex; align-items: center;',
-        }),
-
-    }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -51,7 +47,7 @@ class NewsForm(forms.ModelForm):
 
         content = self.cleaned_data.get("content")
         if len(content) < 20:
-            self.add_error("content", "Содержание должно содержать не менее 20 символов.")
+            self.add_error("content", "Содержание должно содержать не менее 50 символов.")
             valid = False
 
         return valid
