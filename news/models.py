@@ -48,8 +48,10 @@ class Post(models.Model):
     rating = models.IntegerField(default=0, db_column='rating')
 
     author = models.ForeignKey('Author', on_delete=models.CASCADE, related_name='post')
-    category = models.ManyToManyField('Category', through='PostCategory') # Связь многие к многим
+    category = models.ManyToManyField('Category', blank=True, through='PostCategory', verbose_name='Категории')  # Связь многие к многим
+    # category = models.ManyToManyField('Category', blank=True, verbose_name='Категории')
 
+    # ...
     def like(self):
         self.rating += 1
         self.save()

@@ -5,6 +5,8 @@ from news.models import Category
 from news.models import Post
 from news.models import Comment
 
+from news.models import *
+
 
 # ================================ Создать двух юзеров -- авторов
 new_user_1 = User.objects.create_user('notalake')
@@ -130,4 +132,12 @@ r = Comment.objects.filter(post_id=best_ar_id).values_list('t_creation', 'user_i
 Post.objects.count()
 
 
+
+from news.models import *
+
+result = PostCategory.objects.select_related('category', 'post').values(
+    'post_id',
+    'category_id',
+    'category__category_name'
+)
 

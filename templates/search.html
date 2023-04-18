@@ -11,13 +11,12 @@ Post
 <a href="../#" style="position: fixed; left: 0; top: 100px;">Posts</a>
 
   <hr>
-
-   <form action="" method="get"> <!--       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}-->
-       {{ filterset.form.as_p }} <!--       {# Добавим кнопку отправки данных формы #}-->
-       <input type="submit" value="Найти" />
-   </form>
-
-
+<div style="display: flex; justify-content: center;">
+    <form action="" method="get" style="display: flex; flex-direction: column; margin: 0 auto;">
+        {{ filterset.form.as_p }}
+        <input type="submit" value="Найти" />
+    </form>
+</div>
 
   <hr>
 

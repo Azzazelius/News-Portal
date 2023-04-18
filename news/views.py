@@ -13,7 +13,7 @@ from .models import (Author, Category, Post, Comment)
 from .forms import NewsForm
 from .filters import PostFilter
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 
@@ -61,15 +61,23 @@ class ArticlesList(ListView):
     context_object_name = 'articles'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
 
 
-class NewsCreate(PermissionRequiredMixin, CreateView, LoginRequiredMixin):
+class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'news.add_post'
     form_class = NewsForm
     model = Post
     template_name = 'create.html'
     success_url = reverse_lazy('posts_list')
 
+    def edit_news(request):
+        form = NewsForm(request.POST or None)
+        if request.method == 'POST':
+            if form.is_valid():
+                form.save()
+        context = {'form': form}
+        return render(request, 'create.html', context)
 
-class NewsEdit(PermissionRequiredMixin, UpdateView, LoginRequiredMixin):
+
+class NewsEdit(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     permission_required = 'news.change_post'
     form_class = NewsForm
     model = Post
