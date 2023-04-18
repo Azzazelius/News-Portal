@@ -12,7 +12,7 @@ from django.views.generic import (
 from .models import (Author, Category, Post, Comment)
 from .forms import NewsForm
 from .filters import PostFilter
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
@@ -61,21 +61,24 @@ class ArticlesList(ListView):
     context_object_name = 'articles'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
 
 
-class NewsCreate(CreateView, LoginRequiredMixin):
+class NewsCreate(PermissionRequiredMixin, CreateView, LoginRequiredMixin):
+    permission_required = 'news.add_post'
     form_class = NewsForm
     model = Post
     template_name = 'create.html'
     success_url = reverse_lazy('posts_list')
 
 
-class NewsEdit(UpdateView, LoginRequiredMixin):
+class NewsEdit(PermissionRequiredMixin, UpdateView, LoginRequiredMixin):
+    permission_required = 'news.change_post'
     form_class = NewsForm
     model = Post
     template_name = 'create.html'
     success_url = reverse_lazy('posts_list')
 
 
-class NewsDelete(DeleteView):
+class NewsDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = 'news.delete_post'
     model = Post
     template_name = 'delete.html'
     success_url = reverse_lazy('posts_list')
@@ -118,7 +121,12 @@ def upgrade_me(request):
         authors_group.user_set.add(user)
     return redirect('/')
 
-from django.shortcuts import render
+
+
+
+
+
+
 
 
 
