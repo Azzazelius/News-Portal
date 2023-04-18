@@ -49,7 +49,6 @@ class Post(models.Model):
 
     author = models.ForeignKey('Author', on_delete=models.CASCADE, related_name='post')
     category = models.ManyToManyField('Category', blank=True, through='PostCategory', verbose_name='Категории')  # Связь многие к многим
-    # category = models.ManyToManyField('Category', blank=True, verbose_name='Категории')
 
     # ...
     def like(self):
