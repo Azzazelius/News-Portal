@@ -9,14 +9,19 @@ from django.views.generic import (
                                     RedirectView,
                                     TemplateView
                                 )
-from .models import (Author, Category, Post, Comment)
-from .forms import NewsForm
-from .filters import PostFilter
+from .models import (Post, Author, Category, Comment)
+from .forms import NewsForm, SubscribeForm
+from .filters import PostFilter, CategoryFilter
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
+
+from django.template.loader import render_to_string  # импортируем функцию, которая срендерит наш html в текст
+from datetime import datetime
+
+
 
 
 class HomePageView(RedirectView):
@@ -36,7 +41,6 @@ class PostsList(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()  # Получаем обычный запрос
         self.filterset = PostFilter(self.request.GET, queryset)  # Используем наш класс фильтрации. self.request.GET содержит объект QueryDict,
-                                                                 # который мы рассматривали в этом юните ранее.
                                                                  # Сохраняем нашу фильтрацию в объекте класса, чтобы потом добавить в контекст и использовать в шаблоне.
         return self.filterset.qs  # Возвращаем из функции отфильтрованный список товаров
 
@@ -47,19 +51,18 @@ class PostsList(ListView):
         return context
 
 
-
 class PostFull(DetailView):
     model = Post
     template_name = 'post_full.html'
     context_object_name = 'post'
 
-
-class ArticlesList(ListView):
-    model = Post  # Указываем модель, объекты которой мы будем выводить
-    # ordering = '-t_creation'  # Заметка. Тут надо добавить сортировку по времени
-    queryset = Post.objects.filter(post_type='ar') # опциональный фильтр, на случай если ещё пригодится
-    template_name = 'posts/articles.html'  # Указываем имя шаблона, с инструкциями по отображению объектов модели
-    context_object_name = 'articles'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
+# Пока не используется. Запланированно на раздельный вывод новостей и статей
+# class ArticlesList(ListView):
+#     model = Post  # Указываем модель, объекты которой мы будем выводить
+#     # ordering = '-t_creation'  # Заметка. Тут надо добавить сортировку по времени
+#     queryset = Post.objects.filter(post_type='ar') # опциональный фильтр, на случай если ещё пригодится
+#     template_name = 'posts/articles.html'  # Указываем имя шаблона, с инструкциями по отображению объектов модели
+#     context_object_name = 'articles'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
 
 
 class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
@@ -71,23 +74,29 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        categories = self.object.category.all() # создаём список всех категорий в новости
+        news_notify = NewsSendNotify()
+        news_notify.notify(self.object)
+        return response
+
+
+class NewsSendNotify:
+    @staticmethod
+    def notify(post):
+        categories = post.category.all() # создаём список всех категорий в новости
         recipient_list = []
-        for category in categories:  # цикл проходит по каждой категории, собирая информацию о подписчиках,
+        for category in categories: # цикл проходит по каждой категории, собирая информацию о подписчиках,
             # складывая их емейлы в recipient_list
             subscribers = category.subscribers.all()
             recipient_list += [user.email for user in subscribers]
 
         if recipient_list:
-            send_mail(
-                subject=f'Новый пост в категориях "{", ".join([str(category) for category in categories])}"',
-                message=f'Появился новый пост в категориях "{", ".join([str(category) for category in categories])}"\n{self.object.content}',
-                from_email='Pupapekainos@yandex.com',
-                recipient_list=recipient_list,
-                fail_silently=True,
-            )
-            return response
-        return response
+            subject = f'Новый пост в категориях "{", ".join([str(category) for category in categories])}"'
+            message = f'Появился новый пост в категориях "{", ".join([str(category) for category in categories])}"\n{post.content[:50]}'
+            html = render_to_string('news_email.html', {'post': post})
+            from_email = 'Pupapekainos@yandex.com'
+            msg = EmailMultiAlternatives(subject, message, from_email, recipient_list)
+            msg.attach_alternative(html, "text/html")
+            msg.send()
 
 
 class NewsEdit(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
@@ -96,6 +105,12 @@ class NewsEdit(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = Post
     template_name = 'create.html'
     success_url = reverse_lazy('posts_list')
+
+    def form_valid(self, form):   # этот метод тут только для тестирования, менять новость быстрее, чем создавать
+        response = super().form_valid(form)
+        news_notify = NewsSendNotify()
+        news_notify.notify(self.object)
+        return response
 
 
 class NewsDelete(PermissionRequiredMixin, DeleteView):
@@ -109,6 +124,7 @@ class PostSearch(ListView):
     model = Post
     template_name = 'search.html'
     context_object_name = 'posts'
+    success_url = reverse_lazy('posts_list')
 
     def get_queryset(self):
         # Получаем обычный запрос
@@ -131,6 +147,42 @@ class IndexView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['is_not_author'] = not self.request.user.groups.filter(name = 'authors').exists()
         return context
+
+
+class SubscribeView(TemplateView):
+    model = Category
+    form_class = SubscribeForm
+    template_name = 'subscribe.html'
+    context_object_name = 'subscribe'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = CategoryFilter(self.request.GET, queryset)
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filterset = CategoryFilter(self.request.GET, queryset=Category.objects.all())
+        context['filterset'] = filterset
+        return context
+
+    # def form_valid(self, form):
+    #     user = self.request.user
+    #     categories = form.cleaned_data.get('categories')
+    #     for category in categories:
+    #         category.subscribers.add(user)
+    #     return redirect('subscribe-success')
+
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            # process form data
+            return redirect('../')
+        return render(request, self.template_name, {'form': form})
 
 
 @login_required

@@ -1,7 +1,8 @@
 import django_filters
 from django import forms
-from django_filters import FilterSet, DateFilter, CharFilter
-from django.forms.widgets import DateInput
+from django_filters import FilterSet, DateFilter, CharFilter, ModelMultipleChoiceFilter
+from django.forms.widgets import DateInput, SelectMultiple
+
 from .models import Category, Post
 
 
@@ -10,17 +11,6 @@ class PostFilter(FilterSet):
     title = CharFilter(label='Заголовок содержит')
     date_published = DateFilter(field_name='t_creation', lookup_expr='gte', widget=DateInput(attrs={'type': 'date'}),
                                 label='Дата публикации после:')
-    #
-    # category = django_filters.ModelMultipleChoiceFilter(
-    #     queryset=Category.objects.all(),
-    #     widget=forms.SelectMultiple(attrs={
-    #         'class': 'selectpicker',
-    #         'data-live-search': 'true',
-    #         'multiple': True,
-    #         'style': 'display: flex; align-items: center;',
-    #     }))
-    #
-    # author = django_filters.CharFilter(field_name='author__full_name', lookup_expr='icontains', label='Автор')
 
     class Meta:
         model = Post
@@ -31,19 +21,36 @@ class PostFilter(FilterSet):
             'author',
         ]
 
-    # class Meta:
-    #     model = Post
-    #     fields = [
-    #         'author',
-    #     ]
-# class Meta:
-#     # В Meta классе мы должны указать Django модел в которой будем фильтровать записи.
-#     model = Post
-#     # В fields мы описываем по каким полям модели будет производиться фильтрация.
-#     fields = {
-#         'category'
-#     }
+
+# class CategoryFilter(FilterSet):
+#     categories = django_filters.ModelMultipleChoiceFilter(
+#         label='Категории',
+#         queryset=Category.objects.all(),
+#         field_name='categories',
+#         widget=SelectMultiple(attrs={
+#             'class': 'selectpicker',
+#             'data-live-search': 'true',
+#             # 'multiple': True,
+#             'style': 'display: flex; align-items: center;',
+#         }),
+#     )
 #
-#     widgets = {'category': SelectMultiple(attrs={'class': 'form-control'})}
-#
-#
+#     class Meta:
+#         model = Post
+#         fields = [
+#             'categories',
+#         ]
+
+
+class CategoryFilter(FilterSet):
+    categories = ModelMultipleChoiceFilter(
+        queryset=Category.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={
+            'class': 'form-check-input',
+        }),
+        label="Категории",
+    )
+
+    class Meta:
+        model = Post
+        fields = ['categories']

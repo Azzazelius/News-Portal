@@ -132,8 +132,13 @@ r = Comment.objects.filter(post_id=best_ar_id).values_list('t_creation', 'user_i
 Post.objects.count()
 
 # - добавить связь пользователей и категорий
-user_alex = User.objects.get(id=5)
-c_science = Category.objects.get(id=1)
+user_alex = User.objects.get(id=5)  # переменная с id пользователя
+c_science = Category.objects.get(id=1)  # заводим переменную с id категории
 c_culture = Category.objects.get(id=3)
-c_science.subscribers.add(user_alex)
+c_science.subscribers.add(user_alex)  # пользователь становится подписчиком указанной категории новостей
 c_culture.subscribers.add(user_alex)
+
+
+
+Category.objects.get(id=пользователь).subscribers.add(User.objects.get(id=категория1))
+Category.objects.get(id=пользователь).subscribers.add(User.objects.get(id=категория2))

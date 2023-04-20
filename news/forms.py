@@ -1,7 +1,12 @@
 from django import forms
+from django.forms.widgets import CheckboxSelectMultiple
 from django.core.exceptions import ValidationError
 
-from .models import Post
+from .models import Post, Category
+
+
+
+
 
 
 class NewsForm(forms.ModelForm):
@@ -13,12 +18,6 @@ class NewsForm(forms.ModelForm):
             'category',
             'author',
         ]
-    #
-    # widgets = {
-    #     'category': forms.SelectMultiple(attrs={'class': 'selectpicker', 'data-live-search': 'true'}),
-    #
-    # }
-
 
     def clean(self):
         cleaned_data = super().clean()
@@ -51,3 +50,11 @@ class NewsForm(forms.ModelForm):
             valid = False
 
         return valid
+
+
+class SubscribeForm(forms.Form):
+    categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.all(),
+        widget=CheckboxSelectMultiple,
+
+    )

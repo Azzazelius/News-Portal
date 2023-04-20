@@ -1,0 +1,9 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<title style="text-align: center;">{{ post.title|censor }}</title>
+<p>Здравствуй, {{ user.username }}. Новая статья в твоём любимом разделе!</p>
+<p>{{ post.content|censor|truncatechars:50 }}</p>
+
+{% endblock content %}
