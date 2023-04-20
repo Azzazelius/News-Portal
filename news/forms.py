@@ -38,7 +38,7 @@ class NewsForm(forms.ModelForm):
     def is_valid(self):
         valid = super().is_valid()
         if not valid:  # если форма не прошла стандартные проверки, ничего не делаем
-            return valid
+            valid = False
 
         title = self.cleaned_data.get("title")  # дополнительные проверки формы
         if len(title) < 5:
@@ -47,7 +47,7 @@ class NewsForm(forms.ModelForm):
 
         content = self.cleaned_data.get("content")
         if len(content) < 20:
-            self.add_error("content", "Содержание должно содержать не менее 50 символов.")
+            self.add_error("content", "Содержание должно содержать не менее 20 символов.")
             valid = False
 
         return valid

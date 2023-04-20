@@ -127,17 +127,13 @@ best_ar_info = Post.objects.filter(id=best_ar_id).values_list('t_creation', 'aut
 
 r = Comment.objects.filter(post_id=best_ar_id).values_list('t_creation', 'user_id__username', 'rating', 'comment')
 
-
+# --------------------------- новое
 
 Post.objects.count()
 
-
-
-from news.models import *
-
-result = PostCategory.objects.select_related('category', 'post').values(
-    'post_id',
-    'category_id',
-    'category__category_name'
-)
-
+# - добавить связь пользователей и категорий
+user_alex = User.objects.get(id=5)
+c_science = Category.objects.get(id=1)
+c_culture = Category.objects.get(id=3)
+c_science.subscribers.add(user_alex)
+c_culture.subscribers.add(user_alex)

@@ -1,7 +1,6 @@
 # = simpleapp
 from django.urls import path
 from .views import PostsList, PostFull, NewsEdit, NewsCreate, NewsDelete, PostSearch
-#ArticlesList #, CommentsList
 from .views import upgrade_me
 
 
@@ -12,15 +11,6 @@ urlpatterns = [
    path('<int:pk>/delete/', NewsDelete.as_view(), name='news_delete'),
    path('create/', NewsCreate.as_view(), name='news_create'),
    path('search/', PostSearch.as_view(), name='news_search'),
-   path('upgrade/', upgrade_me, name='upgrade')
-
+   path('upgrade/', upgrade_me, name='upgrade'),
+   # path('mailing/', MailingView.as_view('post'), name='mailing'),
 ]
-
-
-
-# /news/create/
-# /news/<int:pk>/edit/
-# /news/<int:pk>/delete/
-# /articles/create/
-# /articles/<int:pk>/edit/
-# /articles/<int:pk>/delete/

@@ -16,6 +16,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 
 
 class HomePageView(RedirectView):
@@ -68,13 +69,25 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     template_name = 'create.html'
     success_url = reverse_lazy('posts_list')
 
-    def edit_news(request):
-        form = NewsForm(request.POST or None)
-        if request.method == 'POST':
-            if form.is_valid():
-                form.save()
-        context = {'form': form}
-        return render(request, 'create.html', context)
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        categories = self.object.category.all() # создаём список всех категорий в новости
+        recipient_list = []
+        for category in categories:  # цикл проходит по каждой категории, собирая информацию о подписчиках,
+            # складывая их емейлы в recipient_list
+            subscribers = category.subscribers.all()
+            recipient_list += [user.email for user in subscribers]
+
+        if recipient_list:
+            send_mail(
+                subject=f'Новый пост в категориях "{", ".join([str(category) for category in categories])}"',
+                message=f'Появился новый пост в категориях "{", ".join([str(category) for category in categories])}"\n{self.object.content}',
+                from_email='Pupapekainos@yandex.com',
+                recipient_list=recipient_list,
+                fail_silently=True,
+            )
+            return response
+        return response
 
 
 class NewsEdit(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
@@ -113,7 +126,6 @@ class PostSearch(ListView):
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
-    template_name = 'protect/index.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -128,13 +140,4 @@ def upgrade_me(request):
     if not request.user.groups.filter(name='authors').exists():
         authors_group.user_set.add(user)
     return redirect('/')
-
-
-
-
-
-
-
-
-
 
