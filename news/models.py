@@ -1,7 +1,11 @@
+from django.core.mail import send_mail
 from django.db import models
 from allauth.account.forms import SignupForm
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.core.validators import MinValueValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.template.loader import render_to_string
 from django.urls import reverse
 
 
@@ -123,3 +127,13 @@ class BasicSignupForm(SignupForm):
         common_group = Group.objects.get(name='common')
         common_group.user_set.add(user)
         return user
+
+
+@receiver(post_save, sender=User)
+def send_welcome_email(sender, instance, created, **kwargs):
+    if created:  # Отправляем письмо только при создании нового пользователя
+        subject = 'Welcome to Our Site!'
+        message = render_to_string('welcome_email.html', {'user': instance})
+        from_email = 'Pupapekainos@yandex.com'
+        recipient_list = [instance.email]
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=message)

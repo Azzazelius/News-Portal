@@ -1,0 +1,15 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block title %}
+Welcome
+{% endblock title %}
+
+
+{% block content %}
+
+<h1>Здравствуй {{ user.username }}!</h1>
+
+<p>Добро пожаловать на сайт самых честных и оперативных новостей!</p>
+
+{% endblock content %}
