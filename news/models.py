@@ -2,6 +2,8 @@ from django.db import models
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
 from django.core.validators import MinValueValidator
+from django.urls import reverse
+
 
 class Author(models.Model):
     full_name = models.CharField(max_length=100)
@@ -51,10 +53,10 @@ class Post(models.Model):
     author = models.ForeignKey('Author', on_delete=models.CASCADE, related_name='post')
     category = models.ManyToManyField('Category', blank=True, through='PostCategory', verbose_name='Категории')  # Связь многие к многим
 
-    # ...
     def like(self):
         self.rating += 1
         self.save()
+
     def dislike(self):
         self.rating -= 1
         self.save()
@@ -65,8 +67,9 @@ class Post(models.Model):
             content += '...'
         return content
 
-    # def __str__(self):
-    #     return self.title
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.id)])
+
 
 '''
 С геттерами не срослось, оставил работу напрямую с переменными
@@ -88,7 +91,6 @@ class Post(models.Model):
 '''
 
 
-
 class PostCategory(models.Model): # Промежуточная модель для связи «многие ко многим»:
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
@@ -97,7 +99,7 @@ class PostCategory(models.Model): # Промежуточная модель дл
 class Comment(models.Model):
     comment = models.TextField(max_length=500)
     t_creation = models.DateTimeField(auto_now_add=True)
-    rating = models.IntegerField(default=0, db_column='rating') #рейтинг самого комментария
+    rating = models.IntegerField(default=0, db_column='rating')  #рейтинг самого комментария
 
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)

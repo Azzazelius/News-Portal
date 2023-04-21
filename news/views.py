@@ -22,8 +22,6 @@ from django.template.loader import render_to_string  # импортируем ф
 from datetime import datetime
 
 
-
-
 class HomePageView(RedirectView):
     url = 'posts/'
     permanent = True
@@ -56,14 +54,6 @@ class PostFull(DetailView):
     template_name = 'post_full.html'
     context_object_name = 'post'
 
-# Пока не используется. Запланированно на раздельный вывод новостей и статей
-# class ArticlesList(ListView):
-#     model = Post  # Указываем модель, объекты которой мы будем выводить
-#     # ordering = '-t_creation'  # Заметка. Тут надо добавить сортировку по времени
-#     queryset = Post.objects.filter(post_type='ar') # опциональный фильтр, на случай если ещё пригодится
-#     template_name = 'posts/articles.html'  # Указываем имя шаблона, с инструкциями по отображению объектов модели
-#     context_object_name = 'articles'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
-
 
 class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'news.add_post'
@@ -79,13 +69,14 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         return response
 
 
+# Класс отпавки нотификации
 class NewsSendNotify:
     @staticmethod
     def notify(post):
         categories = post.category.all() # создаём список всех категорий в новости
         recipient_list = []
-        for category in categories: # цикл проходит по каждой категории, собирая информацию о подписчиках,
-            # складывая их емейлы в recipient_list
+        for category in categories:  # цикл проходит по каждой категории, собирая информацию о подписчиках,
+                                     # складывая их емейлы в recipient_list
             subscribers = category.subscribers.all()
             recipient_list += [user.email for user in subscribers]
 
@@ -127,9 +118,9 @@ class PostSearch(ListView):
     success_url = reverse_lazy('posts_list')
 
     def get_queryset(self):
-        # Получаем обычный запрос
-        queryset = super().get_queryset()
-        # Используем наш класс фильтрации. self.request.GET содержит объект QueryDict, который мы рассматривали в этом юните ранее.
+        queryset = super().get_queryset()  # Получаем обычный запрос
+        # Используем наш класс фильтрации. self.request.GET содержит объект QueryDict,
+        # который мы рассматривали в этом юните ранее.
         # Сохраняем нашу фильтрацию в объекте класса, чтобы потом добавить в контекст и использовать в шаблоне.
         self.filterset = PostFilter(self.request.GET, queryset)
         # Возвращаем из функции отфильтрованный список товаров
@@ -166,12 +157,6 @@ class SubscribeView(TemplateView):
         context['filterset'] = filterset
         return context
 
-    # def form_valid(self, form):
-    #     user = self.request.user
-    #     categories = form.cleaned_data.get('categories')
-    #     for category in categories:
-    #         category.subscribers.add(user)
-    #     return redirect('subscribe-success')
 
     def get(self, request):
         form = self.form_class()
@@ -192,4 +177,39 @@ def upgrade_me(request):
     if not request.user.groups.filter(name='authors').exists():
         authors_group.user_set.add(user)
     return redirect('/')
+
+
+
+
+# Пока не используется. Запланированно на раздельный вывод новостей и статей
+#
+# class ArticlesList(ListView):
+#     model = Post  # Указываем модель, объекты которой мы будем выводить
+#     # ordering = '-t_creation'  # Заметка. Тут надо добавить сортировку по времени
+#     queryset = Post.objects.filter(post_type='ar') # опциональный фильтр, на случай если ещё пригодится
+#     template_name = 'posts/articles.html'  # Указываем имя шаблона, с инструкциями по отображению объектов модели
+#     context_object_name = 'articles'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
+
+
+
+    # Код оставшийся с одной из реализациq вьюхи подписки. Не удаляю, что бы помнить, что такое уже пробовал
+    #
+    # def form_valid(self, form):
+    #     user = self.request.user
+    #     categories = form.cleaned_data.get('categories')
+    #     for category in categories:
+    #         category.subscribers.add(user)
+    #     return redirect('subscribe-success')
+
+
+# Заметки на оповешение манагеров
+# ---------------------------
+# def notify_managers_appointment(sender, instance, created, **kwargs):
+#     subject = f'{instance.client_name} {instance.date.strftime("%d %m %Y")}'
+#
+#     mail_managers(
+#         subject=subject,
+#         message=instance.message,
+#     )
+#
 

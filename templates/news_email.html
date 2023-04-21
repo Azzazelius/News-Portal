@@ -5,5 +5,7 @@
 <title style="text-align: center;">{{ post.title|censor }}</title>
 <p>Здравствуй, {{ user.username }}. Новая статья в твоём любимом разделе!</p>
 <p>{{ post.content|censor|truncatechars:50 }}</p>
+<a href="{{ post.get_absolute_url }}">Читать далее</a>
+
 
 {% endblock content %}
