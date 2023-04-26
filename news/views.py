@@ -17,6 +17,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail, EmailMultiAlternatives
+from .tasks import notify
 
 from django.template.loader import render_to_string  # импортируем функцию, которая срендерит наш html в текст
 from datetime import datetime
@@ -64,11 +65,14 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        news_notify = NewsSendNotify()
-        news_notify.notify(self.object)
+        notify.delay(self.object.id)  # запрос на отправку нотификации notify из taska.py через celery.py
         return response
 
 
+# =======================================?
+
+
+# Перенеси функционал этого класса в код task.py для  celery
 # Класс отпавки нотификации
 class NewsSendNotify:
     @staticmethod

@@ -72,7 +72,7 @@ class Post(models.Model):
         return content
 
     def get_absolute_url(self):
-        return reverse('post_detail', args=[str(self.id)])
+        return reverse('post_full', args=[str(self.id)])
 
 
 '''

@@ -177,6 +177,12 @@ EMAIL_HOST_USER = 'Pupapekainos'  # ваше имя пользователя, н
                                   # то сюда надо писать user, иными словами, это всё то что идёт до собаки
 EMAIL_HOST_PASSWORD = 'pxkzxpmkusgaognw'  # пароль от почты
 EMAIL_USE_SSL = True  # Яндекс использует ssl, подробнее о том, что это, почитайте в дополнительных источниках,
-                      # но включать его здесь обязательно
+                        # но включать его здесь обязательно
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+CELERY_BROKER_URL = 'redis://default:LUmQ0FOlqLbSGkRVL9DfHfXhMiyqdvf2@redis-17703.c293.eu-central-1-1.ec2.cloud.redislabs.com:17703'  # — указывает на URL брокера сообщений (Redis). По умолчанию он находится на порту 6379.
+CELERY_RESULT_BACKEND = 'redis://default:LUmQ0FOlqLbSGkRVL9DfHfXhMiyqdvf2@redis-17703.c293.eu-central-1-1.ec2.cloud.redislabs.com:17703'  # — указывает на хранилище результатов выполнения задач.
+CELERY_ACCEPT_CONTENT = ['application/json']  # — допустимый формат данных.
+CELERY_TASK_SERIALIZER = 'json'  # — метод сериализации задач.
+CELERY_RESULT_SERIALIZER = 'json'  # — метод сериализации результатов.

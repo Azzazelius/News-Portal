@@ -4,6 +4,7 @@ from .views import *
 
 urlpatterns = [
    path('', PostsList.as_view(), name='posts_list'),
+   path('', IndexView.as_view()),
    path('<int:pk>/', PostFull.as_view(), name='post_full'),
    path('<int:pk>/edit/', NewsEdit.as_view(), name='news_edit'),
    path('<int:pk>/delete/', NewsDelete.as_view(), name='news_delete'),
