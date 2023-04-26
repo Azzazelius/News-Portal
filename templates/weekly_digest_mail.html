@@ -1,0 +1,33 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<title style="text-align: center;">Дайджест за неделю</title>
+<p>Здравствуй, {{ user.username }}. </p>>
+<p> {{ posts|length }} - столько новостей вышло за прошедшую неделю.</p>>
+
+
+<div style="display: flex; justify-content: center;">
+    <form action="" method="get" style="display: flex; flex-direction: column; margin: 0 auto;">
+        {{ filterset.form.as_p }}
+        <input type="submit" value="Найти" />
+    </form>
+</div>
+
+<!--Перенёс из отображения результатов поиска-->
+
+<hr>
+
+{% for post in posts %}
+   <a href="{% url 'post_full' pk=post.pk %}" style="display: block; text-align: center; font-size:24px; font-weight: bold">{{post.title|censor}}</a>
+    <p></p>
+   <h6 style="text-align: left; font-style: italic;">{{post.content|truncatewords:20|censor}}</h6>
+    <p></p>
+   <div style="display: flex; justify-content: space-between; align-items: center;">
+       <h6>{{post.author}} {{post.t_creation|date:"j.F.Y" }}</h6>
+       <h6>Рейтинг: {{post.rating}}</h6>
+   </div>
+   <hr>
+{% endfor %}
+
+{% endblock content %}

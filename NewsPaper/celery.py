@@ -1,5 +1,6 @@
 import os
 from celery import Celery
+from celery.schedules import crontab
 
 
 # ↓↓ Окружение DJANGO_SETTINGS_MODULE, настройки проекта NewsPaper
@@ -17,5 +18,12 @@ if __name__ == '__main__':
     # Запуск Celery как асинхронного процесса
     app.start()
 
+# запуск еженедельной рассылки
+app.conf.beat_schedule = {
+    'action_weekly_digest': {
+        'task': 'news.tasks.weekly_notify',
+        'schedule': crontab(hour=8, minute=0, day_of_week='monday'),
+    },
+}
 
 

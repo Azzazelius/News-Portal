@@ -7,17 +7,16 @@ from django.views.generic import (
                                     UpdateView,
                                     DeleteView,
                                     RedirectView,
-                                    TemplateView
+                                    TemplateView,
                                 )
 from .models import (Post, Author, Category, Comment)
 from .forms import NewsForm, SubscribeForm
-from .filters import PostFilter, CategoryFilter
+from .filters import PostFilter, CategoryFilter, WeeklyPostFilter
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from .tasks import notify
-
 
 
 class HomePageView(RedirectView):
@@ -64,27 +63,6 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         response = super().form_valid(form)
         notify.delay(self.object.id)  # запрос на отправку нотификации notify из taska.py через celery.py
         return response
-
-
-# Класс отпавки нотификации. Старый вариант, можно удалять если новая рассылка нотификаций работает.
-# class NewsSendNotify:
-#     @staticmethod
-#     def notify(post):
-#         categories = post.category.all() # создаём список всех категорий в новости
-#         recipient_list = []
-#         for category in categories:  # цикл проходит по каждой категории, собирая информацию о подписчиках,
-#                                      # складывая их емейлы в recipient_list
-#             subscribers = category.subscribers.all()
-#             recipient_list += [user.email for user in subscribers]
-#
-#         if recipient_list:
-#             subject = f'Новый пост в категориях "{", ".join([str(category) for category in categories])}"'
-#             message = f'Появился новый пост в категориях "{", ".join([str(category) for category in categories])}"\n{post.content[:50]}'
-#             html = render_to_string('news_email.html', {'post': post})
-#             from_email = 'Pupapekainos@yandex.com'
-#             msg = EmailMultiAlternatives(subject, message, from_email, recipient_list)
-#             msg.attach_alternative(html, "text/html")
-#             msg.send()
 
 
 class NewsEdit(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
@@ -147,7 +125,6 @@ class SubscribeView(TemplateView):
         context['filterset'] = filterset
         return context
 
-
     def get(self, request):
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
@@ -157,6 +134,24 @@ class SubscribeView(TemplateView):
         if form.is_valid():
             return redirect('../')
         return render(request, self.template_name, {'form': form})
+
+
+class WeeklyPostsView(ListView):
+    model = Post
+    template_name = 'weekly_digest_mail.html'
+    context_object_name = 'posts'
+    # success_url = reverse_lazy('posts_list')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = WeeklyPostFilter(self.request.GET, queryset)
+        # Возвращаем из функции отфильтрованный список постов
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filterset'] = self.filterset
+        return context
 
 
 @login_required
