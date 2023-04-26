@@ -2,11 +2,10 @@ import os
 from celery import Celery
 
 
-# Окружение DJANGO_SETTINGS_MODULE, настройки проекта NewsPaper
-# через DJANGO_SETTINGS_MODULE django понимает что настройки celery надо брать из этого файла
-# и использовать для проекта NewsPaper.
-# Поэтому в когда в view.py запускается метод notify.delay() celery знает, что надо брать настройки из celery.py
-
+# ↓↓ Окружение DJANGO_SETTINGS_MODULE, настройки проекта NewsPaper
+# ↓↓ через DJANGO_SETTINGS_MODULE django понимает что настройки celery надо брать из этого файла
+# ↓↓ и использовать для проекта NewsPaper.
+# ↓↓ Поэтому в когда в view.py запускается метод notify.delay() celery знает, что надо брать настройки из celery.py
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'NewsPaper.settings')
 
 app = Celery('NewsPaper') # экземпляр приложения Celery

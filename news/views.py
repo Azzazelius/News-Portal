@@ -16,11 +16,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail, EmailMultiAlternatives
 from .tasks import notify
 
-from django.template.loader import render_to_string  # импортируем функцию, которая срендерит наш html в текст
-from datetime import datetime
 
 
 class HomePageView(RedirectView):
@@ -41,7 +38,7 @@ class PostsList(ListView):
         queryset = super().get_queryset()  # Получаем обычный запрос
         self.filterset = PostFilter(self.request.GET, queryset)  # Используем наш класс фильтрации. self.request.GET содержит объект QueryDict,
                                                                  # Сохраняем нашу фильтрацию в объекте класса, чтобы потом добавить в контекст и использовать в шаблоне.
-        return self.filterset.qs  # Возвращаем из функции отфильтрованный список товаров
+        return self.filterset.qs  # Возвращаем из функции отфильтрованный список постов
 
     def get_context_data(self, **kwargs):  # Метод get_context_data позволяет нам изменить набор данных, который будет передан в шаблон.
         context = super().get_context_data(**kwargs)
@@ -69,29 +66,25 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         return response
 
 
-# =======================================?
-
-
-# Перенеси функционал этого класса в код task.py для  celery
-# Класс отпавки нотификации
-class NewsSendNotify:
-    @staticmethod
-    def notify(post):
-        categories = post.category.all() # создаём список всех категорий в новости
-        recipient_list = []
-        for category in categories:  # цикл проходит по каждой категории, собирая информацию о подписчиках,
-                                     # складывая их емейлы в recipient_list
-            subscribers = category.subscribers.all()
-            recipient_list += [user.email for user in subscribers]
-
-        if recipient_list:
-            subject = f'Новый пост в категориях "{", ".join([str(category) for category in categories])}"'
-            message = f'Появился новый пост в категориях "{", ".join([str(category) for category in categories])}"\n{post.content[:50]}'
-            html = render_to_string('news_email.html', {'post': post})
-            from_email = 'Pupapekainos@yandex.com'
-            msg = EmailMultiAlternatives(subject, message, from_email, recipient_list)
-            msg.attach_alternative(html, "text/html")
-            msg.send()
+# Класс отпавки нотификации. Старый вариант, можно удалять если новая рассылка нотификаций работает.
+# class NewsSendNotify:
+#     @staticmethod
+#     def notify(post):
+#         categories = post.category.all() # создаём список всех категорий в новости
+#         recipient_list = []
+#         for category in categories:  # цикл проходит по каждой категории, собирая информацию о подписчиках,
+#                                      # складывая их емейлы в recipient_list
+#             subscribers = category.subscribers.all()
+#             recipient_list += [user.email for user in subscribers]
+#
+#         if recipient_list:
+#             subject = f'Новый пост в категориях "{", ".join([str(category) for category in categories])}"'
+#             message = f'Появился новый пост в категориях "{", ".join([str(category) for category in categories])}"\n{post.content[:50]}'
+#             html = render_to_string('news_email.html', {'post': post})
+#             from_email = 'Pupapekainos@yandex.com'
+#             msg = EmailMultiAlternatives(subject, message, from_email, recipient_list)
+#             msg.attach_alternative(html, "text/html")
+#             msg.send()
 
 
 class NewsEdit(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
@@ -100,12 +93,6 @@ class NewsEdit(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = Post
     template_name = 'create.html'
     success_url = reverse_lazy('posts_list')
-
-    def form_valid(self, form):   # этот метод тут только для тестирования, менять новость быстрее, чем создавать
-        response = super().form_valid(form)
-        news_notify = NewsSendNotify()
-        news_notify.notify(self.object)
-        return response
 
 
 class NewsDelete(PermissionRequiredMixin, DeleteView):
@@ -124,10 +111,9 @@ class PostSearch(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()  # Получаем обычный запрос
         # Используем наш класс фильтрации. self.request.GET содержит объект QueryDict,
-        # который мы рассматривали в этом юните ранее.
         # Сохраняем нашу фильтрацию в объекте класса, чтобы потом добавить в контекст и использовать в шаблоне.
         self.filterset = PostFilter(self.request.GET, queryset)
-        # Возвращаем из функции отфильтрованный список товаров
+        # Возвращаем из функции отфильтрованный список постов
         return self.filterset.qs
 
     def get_context_data(self, **kwargs):
@@ -169,7 +155,6 @@ class SubscribeView(TemplateView):
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
-            # process form data
             return redirect('../')
         return render(request, self.template_name, {'form': form})
 

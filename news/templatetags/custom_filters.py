@@ -9,7 +9,7 @@ register = template.Library()
 
 bad_words = ["редиска", "Редиски", "петух гамбургской", "Новохудоноссор"]
 
-@register.filter()
+@register.filter()  # фильтр для цензуры
 def censor(value):
    for word in bad_words:
       if word.lower() in value.lower():
@@ -17,6 +17,6 @@ def censor(value):
    return value
 
 
-@register.filter(name='has_group')
+@register.filter(name='has_group') # фильтр проверяющий к какой группе относится юзер
 def has_group(user, group_name):
     return user.groups.filter(name=group_name).exists()
