@@ -17,6 +17,8 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from .tasks import notify
+from django.core.cache import cache
+
 
 
 class HomePageView(RedirectView):
@@ -51,6 +53,16 @@ class PostFull(DetailView):
     template_name = 'post_full.html'
     context_object_name = 'post'
 
+    def get_object(self, queryset=None):
+        post_id = self.kwargs.get('id')
+        cache_key = f'post_{post_id}'
+
+        post = cache.get(cache_key)
+        if post is None:
+            post = super().get_object(queryset)
+            cache.set(cache_key, post)
+
+        return post
 
 class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'news.add_post'
@@ -71,6 +83,11 @@ class NewsEdit(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = Post
     template_name = 'create.html'
     success_url = reverse_lazy('posts_list')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        cache.delete(f'post_{self.object.id}')
+        return response
 
 
 class NewsDelete(PermissionRequiredMixin, DeleteView):
