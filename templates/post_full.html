@@ -1,6 +1,6 @@
 <!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
 {% extends 'flatpages/default.html' %}
-
+{% load cache %}
 {% load custom_filters %}
 
 {% block title %}
@@ -8,15 +8,16 @@ PostFull
 {% endblock title %}
 
 
-
-<!-- В контенте на странице мы выводим новость, идентификатор которого был передан в url -->
 {% block content %}
+{% cache 300 cache_post_full %}
+
+<!--Кнопки навигации-->
 <a href="../#" style="position: fixed; left: 0; top: 100px;">Back</a>
 <a href="edit" style="position: fixed; left: 0; top: 140px;">Edit</a>
 <a href="delete" style="position: fixed; left: 0; top: 180px;">Delete</a>
 
 
-<h1 style="text-align: center; font-size: 2em;">{{ post.title|censor }}</h1>
+<h1 style="text-align: center; font-size: 2em;">{{ post.title|censor }}</h1> <!-- В контенте на странице мы выводим новость, идентификатор которого был передан в url -->
 <hr>
 
 <p style="font-family: monospace; text-align: left;">{{ post.content|censor }}</p>
@@ -25,7 +26,9 @@ PostFull
 
 <hr>
 <p style="text-align: right;">Категории: {{post.category.all|join:", "}}</p>
+{% endcache %}
 
+<!--Комменты пока не доделаны и не отображаются-->
 <h3>{{Comment.comment}}</h3>
 
 {% endblock content %}
