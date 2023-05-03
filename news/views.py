@@ -64,6 +64,7 @@ class PostFull(DetailView):
 
         return post
 
+
 class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'news.add_post'
     form_class = NewsForm

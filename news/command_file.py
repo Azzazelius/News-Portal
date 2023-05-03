@@ -140,5 +140,9 @@ c_culture.subscribers.add(user_alex)
 
 
 
-Category.objects.get(id=пользователь).subscribers.add(User.objects.get(id=категория1))
-Category.objects.get(id=пользователь).subscribers.add(User.objects.get(id=категория2))
+Category.objects.get(id='пользователь').subscribers.add(User.objects.get(id='категория1'))
+Category.objects.get(id='пользователь').subscribers.add(User.objects.get(id='категория2'))
+
+category = django_filters.Filter(field_name='categories', lookup_expr='id')
+
+Category.objects.filter
