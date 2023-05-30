@@ -56,6 +56,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+
+    'django.middleware.locale.LocaleMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -63,6 +66,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+
+
 ]
 
 ROOT_URLCONF = 'NewsPaper.urls'
@@ -123,13 +128,20 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+DEFAULT_CHARSET = 'utf-8'
+
+LANGUAGE_CODE = 'en-en'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
 USE_TZ = True
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale')
+]
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -174,12 +186,11 @@ DEFAULT_FROM_EMAIL = 'Pupapekainos@yandex.com'
 
 EMAIL_HOST = 'smtp.yandex.ru'  # адрес сервера Яндекс-почты для всех один и тот же
 EMAIL_PORT = 465  # порт smtp сервера тоже одинаковый
-EMAIL_HOST_USER = 'Pupapekainos'  # ваше имя пользователя, например, если ваша почта user@yandex.ru,
-                                  # то сюда надо писать user, иными словами, это всё то что идёт до собаки
-EMAIL_HOST_PASSWORD = 'pxkzxpmkusgaognw'  # пароль от почты
-EMAIL_USE_SSL = True  # Яндекс использует ssl, подробнее о том, что это, почитайте в дополнительных источниках,
-                        # но включать его здесь обязательно
+EMAIL_HOST_USER = 'Pupapekainos'  # имя пользователя, всё то что идёт до собаки
+EMAIL_HOST_PASSWORD = 'hereCanBeYourPassword'  # Настоящий пароль спрянат
+EMAIL_USE_SSL = True
 
+# Яндекс заблокировал почту, приняв рассылку за спам. Пока не разберусь, использую консоль для вывода писем.
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 CELERY_BROKER_URL = 'redis://default:LUmQ0FOlqLbSGkRVL9DfHfXhMiyqdvf2@redis-17703.c293.eu-central-1-1.ec2.cloud.redislabs.com:17703'  # — указывает на URL брокера сообщений (Redis). По умолчанию он находится на порту 6379.
@@ -192,7 +203,8 @@ CELERY_RESULT_SERIALIZER = 'json'  # — метод сериализации р�
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': os.path.join(BASE_DIR, 'cache_files'), # Указываем, куда будем сохранять кэшируемые файлы! Не забываем создать папку cache_files внутри папки с manage.py!
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'), # Указываем, куда будем сохранять кэшируемые файлы!
+        # Не забываем создать папку cache_files внутри папки с manage.py!
     }
 }
 

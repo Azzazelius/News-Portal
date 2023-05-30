@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from .models import Post, Category
 
 
+# класс NewsForm отправляет на сервер запрос добавить в базу данных перечисленные поля
+# на этот класс идёт ссылка из views.py где так же указывается с какой моделью надо взаимодействовать
 class NewsForm(forms.ModelForm):
     class Meta:
         model = Post

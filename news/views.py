@@ -1,5 +1,7 @@
 # Импортируем класс, который говорит нам о том,что в этом представлении мы будем выводить список объектов из БД
+from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import (
                                     ListView,
                                     DetailView,
@@ -18,6 +20,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from .tasks import notify
 from django.core.cache import cache
+from django.utils.translation import gettext as _  # импортируем функцию для перевода
 
 
 
@@ -54,17 +57,23 @@ class PostFull(DetailView):
     context_object_name = 'post'
 
     def get_object(self, queryset=None):
-        post_id = self.kwargs.get('id')
-        cache_key = f'post_{post_id}'
+        post = super().get_object(queryset)
 
-        post = cache.get(cache_key)
-        if post is None:
-            post = super().get_object(queryset)
-            cache.set(cache_key, post)
+        # Кэширование глючит, кэшируется одна новость и показывается при открытии любой новости.
+        # Закомментил пока не починю
 
+        # post_id = self.kwargs.get('id')
+        # cache_key = f'post_{post_id}'
+        # post = cache.get(cache_key)
+        # if post is None:
+        #     post = super().get_object(queryset)
+        #     cache.set(cache_key, post)
         return post
 
 
+# form_class = NewsForm - определяет, что для создания новой записи со страницы в БД надо использовать форму из forms.py
+# model = Post - указывает, к какой модели из model.py идёт обращение
+# template_name = 'create.html' - какой HTML template используется.
 class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'news.add_post'
     form_class = NewsForm
@@ -179,6 +188,15 @@ def upgrade_me(request):
     if not request.user.groups.filter(name='authors').exists():
         authors_group.user_set.add(user)
     return redirect('/')
+
+
+class Index(View):
+    def get(self, request):
+        string = _('Hello world')
+
+        return HttpResponse(string)
+
+
 
 
 
