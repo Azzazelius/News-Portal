@@ -1,32 +1,28 @@
-{% extends 'flatpages/default.html' %}
+{% extends 'flatpages/layout.html' %}
 {% load custom_filters %}
 
 {% block title %}
 Subscribe
 {% endblock title %}
 
-
 {% block content %}
+<div class="features">
+        <h1>Управление подпиской</h1>
+        <h5>Выберите категории, на которые хотите подписаться:</h5>
+        <h6>Выбирать несколько можно с зажатым ctrl</h6>
+    <hr>
 
-<body>
-	<h1>Управление подпиской</h1>
-	<p>Выберите категории, на которые хотите подписаться:</p>
-	<a href="../#" style="position: fixed; left: 0; top: 100px;">Back</a>
-
-<hr>
-
-
-<form action="{% url 'subscribe' %}" method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-
-{% for category in filterset.form.categories %}
-    <input type="checkbox" name="{{ category.name }}" value="{{ category.choice_value }}">
-    <span>{{ category.choice_label }}</span>
-{% endfor %}
-  <button type="submit">Подписаться</button>
-
-</form>
-
+    <form action="{% url 'subscribe' %}" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+    {% for category in filterset.form.categories %}
+        <input type="checkbox" name="{{ category.name }}" value="{{ category.choice_value }}">
+        <span>{{ category.choice_label }}</span>
+    {% endfor %}
+        <button type="submit" class="btn btn-success">Подписаться</button>
+        <br>
+    </form>
+        <a href="../#"><button class="btn btn-danger">Back</button></a>
+</div>
 
 {% endblock content %}

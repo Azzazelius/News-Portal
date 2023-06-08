@@ -1,13 +1,24 @@
-{% extends 'flatpages/default.html' %}
+{% extends 'flatpages/layout.html' %}
+
 
 {% load custom_filters %}
 
 {% block content %}
-<h1>Удалить новость?</h1>
-<hr>
-<form action="" method="post">
-    {% csrf_token %}
-    <p>Удалить "{{ post.title|censor }}"?</p>
-    <input type="submit" value="Delete" />
-</form>
+<div class="fulln" >
+    <h1>Удалить новость?</h1>
+        <a href="../#"><button class="btn btn btn-primary">Back</button></a>
+
+</div>
+<br>
+<br>
+<br>
+    <hr>
+    <form action="" method="post" style="text-align: center; position: absolute; left: 8%;">
+        {% csrf_token %}
+        <p>Удалить "{{ post.title|censor }}"?</p>
+        <input type="submit" class="btn btn-danger" value="Delete" />
+    </form>
+</div>
+
 {% endblock content %}
+

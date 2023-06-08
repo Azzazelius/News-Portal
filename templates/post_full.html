@@ -1,34 +1,39 @@
 <!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
-{% extends 'flatpages/default.html' %}
-<!--{% load cache %}-->
+<!-- extends 'flatpages/default.html' %}-->
+{% extends 'flatpages/layout.html' %}
+
+<!-- load cache %}-->
 {% load custom_filters %}
 
 {% block title %}
 PostFull
 {% endblock title %}
 
-
 {% block content %}
-<!--{% cache 300 cache_post_full %}-->
+<!-- cache 300 cache_post_full %}-->
 
-<!--Кнопки навигации-->
-<a href="../#" style="position: fixed; left: 0; top: 100px;">Back</a>
-<a href="edit" style="position: fixed; left: 0; top: 140px;">Edit</a>
-<a href="delete" style="position: fixed; left: 0; top: 180px;">Delete</a>
+<div class="fulln">
+        <h1 style="text-align: center; font-size: 2em;">{{ post.title|censor }}</h1> <!-- В контенте на странице мы выводим новость, идентификатор которого был передан в url -->
+        <hr>
+    <p style="text-align: right;">Категории: {{post.category.all|join:", "}}</p>
+     <div class="alert alert-warning">
+        <p style="font-family: monospace; text-align: left;">{{ post.content|censor }}</p>
+        <p style="text-align: right;">{{ post.author }}</p>
+        <p style="text-align: right;">{{post.t_creation|date:"j.m.Y"}}</p>
+    </div>
 
+    <inline>
+    <a href="../#"><button class="btn btn btn-primary">Back</button></a>
+    <a href="edit"><button class="btn btn-warning">Edit</button></a>
+    <a href="delete"><button class="btn btn-danger">Delete</button></a>
+    </inline>
 
-<h1 style="text-align: center; font-size: 2em;">{{ post.title|censor }}</h1> <!-- В контенте на странице мы выводим новость, идентификатор которого был передан в url -->
-<hr>
+</div>
 
-<p style="font-family: monospace; text-align: left;">{{ post.content|censor }}</p>
-<p style="text-align: right;">{{ post.author }}</p>
-<p style="text-align: right;">{{post.t_creation|date:"j.m.Y"}}</p>
+    <hr>
 
-<hr>
-<p style="text-align: right;">Категории: {{post.category.all|join:", "}}</p>
-<!--{% endcache %}-->
+    <!-- endcache %}-->
 
-<!--Комменты пока не доделаны и не отображаются-->
-<h3>{{Comment.comment}}</h3>
-
+    <!--Комменты пока не доделаны и не отображаются-->
+    <h3>{{Comment.comment}}</h3>
 {% endblock content %}
