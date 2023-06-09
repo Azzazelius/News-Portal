@@ -83,7 +83,7 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        notify.delay(self.object.id)  # запрос на отправку нотификации notify из taska.py через celery.py
+        notify.delay(self.object.id)  # запрос на отправку нотификации notify из task.py через celery.py
         return response
 
 
