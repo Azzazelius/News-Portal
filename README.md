@@ -1,3 +1,67 @@
+English version.
+
+                                                    Graduation work: News portal
+
+                                                        Development stack:
+- Python 3.8
+  - IDE: PYcharm,
+- pSQL database
+  - Dbeaver for SQL query
+- Redis
+- Celery
+- HTML
+- CSS
+
+
+                                                            Functional:
+- The site is running on a local server
+
+**Users**
+- Available simple registration and through a google account
+- Configured access levels. 
+  - Part of the functionality is available only to registered users
+  - Another part is limited to the “authors” group
+
+**News**
+- The main page displays news from the database.
+     - Pagination works
+- The filter censoring Russian “curses”. 
+See file custom_filters.py
+- You can open the full text, where you can edit and delete news.
+- You can add news in the following ways:
+   - On the site through the Create page, where you can edit the news
+     	- Only available to registered users from the authors group.
+   - Through the site admin panel, login admin, password admin, (never tell anyone your password)
+   - In the file ** command_file.py ** set to fill through the terminal of filling tables.
+
+**Subscription**
+- There are several types of mailing lists:
+     - Newsletter once a week comes a selection of new articles from selected subscription categories.
+     - When there are new posts from these categories.
+     - Upon registration, you will receive a welcome email.
+     - Newsletters work only in test mode. EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+                                                            In development::
+- Functional like / dislike and  leave comments
+  - Already implemented in the database, but not on the site.
+- News list caching.
+- Delete the second type of posts. “articles” (**Article**) - extra entity
+
+
+                                                             Known Bugs:
+- Unauthorized user is shown buttons for editing the news, but when pressed, an error occurs
+- Search by title does not work.
+- In the search, categories are selected only with ctrl pressed, should be by a simple click
+- Both registration options are signed “Sign UP with social Account”. It is necessary to change the inscription or separate the registration on different pages.
+- Layout not configured
+
+
+
+<hr>            
+Russian version
+
+                                                  
                                                   Учебная работа: новостной портал
 
                                                         Что использовалось:
