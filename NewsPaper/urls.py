@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from news.views import HomePageView
+from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 
 
@@ -10,7 +10,7 @@ urlpatterns = [
    path('posts/', include('news.urls')),  # < Подключаем представления сначала в news\urls.py находим  PostsList.as_view, => views.py template_name = 'posts.html'
    path('accounts/', include('django.contrib.auth.urls')),
    path('accounts/social/', include('allauth.urls')),
-   path('', HomePageView.as_view(), name='home'),
+   path('', TemplateView.as_view(template_name='homepage.html'), name='home'),
 
 ]
 

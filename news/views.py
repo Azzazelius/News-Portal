@@ -3,14 +3,14 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import (
-                                    ListView,
-                                    DetailView,
-                                    CreateView,
-                                    UpdateView,
-                                    DeleteView,
-                                    RedirectView,
-                                    TemplateView,
-                                )
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+    RedirectView,
+    TemplateView,
+)
 from .models import (Post, Author, Category, Comment)
 from .forms import NewsForm, SubscribeForm
 from .filters import PostFilter, CategoryFilter, WeeklyPostFilter
@@ -21,18 +21,14 @@ from django.contrib.auth.decorators import login_required
 from .tasks import notify
 from django.core.cache import cache
 from django.utils.translation import gettext as _  # импортируем функцию для перевода
+from django.http import HttpResponse
 
-
-
-class HomePageView(RedirectView):
-    url = 'posts/'
-    permanent = True
 
 
 class PostsList(ListView):
-    model = Post # Указываем модель, объекты которой мы будем выводить
+    model = Post  # Указываем модель, объекты которой мы будем выводить
     # ordering = 't_creation' # Заметка. Тут надо добавить сортировку по времени
-    ordering = '-t_creation' # Заметка. Тут надо добавить сортировку по времени
+    ordering = '-t_creation'  # Заметка. Тут надо добавить сортировку по времени
     # queryset = .objects.filter # опциональный фильтр, на случай если ещё пригодится
     template_name = 'posts.html'  # Указываем имя шаблона, с инструкциями по отображению объектов модели
     context_object_name = 'posts'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
@@ -40,11 +36,13 @@ class PostsList(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()  # Получаем обычный запрос
-        self.filterset = PostFilter(self.request.GET, queryset)  # Используем наш класс фильтрации. self.request.GET содержит объект QueryDict,
-                                                                 # Сохраняем нашу фильтрацию в объекте класса, чтобы потом добавить в контекст и использовать в шаблоне.
+        self.filterset = PostFilter(self.request.GET,
+                                    queryset)  # Используем наш класс фильтрации. self.request.GET содержит объект QueryDict,
+        # Сохраняем нашу фильтрацию в объекте класса, чтобы потом добавить в контекст и использовать в шаблоне.
         return self.filterset.qs  # Возвращаем из функции отфильтрованный список постов
 
-    def get_context_data(self, **kwargs):  # Метод get_context_data позволяет нам изменить набор данных, который будет передан в шаблон.
+    def get_context_data(self,
+                         **kwargs):  # Метод get_context_data позволяет нам изменить набор данных, который будет передан в шаблон.
         context = super().get_context_data(**kwargs)
         context['filterset'] = self.filterset  # Добавляем в контекст объект фильтрации.
         context['post_count'] = Post.objects.count()
@@ -131,7 +129,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_not_author'] = not self.request.user.groups.filter(name = 'authors').exists()
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
 
@@ -167,6 +165,7 @@ class WeeklyPostsView(ListView):
     model = Post
     template_name = 'weekly_digest_mail.html'
     context_object_name = 'posts'
+
     # success_url = reverse_lazy('posts_list')
 
     def get_queryset(self):
@@ -196,11 +195,6 @@ class Index(View):
 
         return HttpResponse(string)
 
-
-
-
-
-
 # Пока не используется. Запланированно на раздельный вывод новостей и статей
 #
 # class ArticlesList(ListView):
@@ -211,15 +205,14 @@ class Index(View):
 #     context_object_name = 'articles'  # Это имя списка где лежат все объекты. К нему обращаемся в html-шаблоне.
 
 
-
-    # Код оставшийся с одной из реализациq вьюхи подписки. Не удаляю, что бы помнить, что такое уже пробовал
-    #
-    # def form_valid(self, form):
-    #     user = self.request.user
-    #     categories = form.cleaned_data.get('categories')
-    #     for category in categories:
-    #         category.subscribers.add(user)
-    #     return redirect('subscribe-success')
+# Код оставшийся с одной из реализациq вьюхи подписки. Не удаляю, что бы помнить, что такое уже пробовал
+#
+# def form_valid(self, form):
+#     user = self.request.user
+#     categories = form.cleaned_data.get('categories')
+#     for category in categories:
+#         category.subscribers.add(user)
+#     return redirect('subscribe-success')
 
 
 # Заметки на оповешение манагеров
@@ -232,4 +225,3 @@ class Index(View):
 #         message=instance.message,
 #     )
 #
-
